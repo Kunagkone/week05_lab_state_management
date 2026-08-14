@@ -1,34 +1,30 @@
 import 'package:flutter/material.dart';
 import '../models/item.dart';
+import 'item_card.dart';
 
-class ItemCard extends StatelessWidget {
-  final Item item;
-  final List<Item> savedItems; // ต้องรับมาเพื่อเช็คว่าไอเทมนี้ถูกบันทึกแล้วหรือยัง (Prop Drilling)
-  final void Function(Item item) onSave; // ฟังก์ชันที่ถูกส่งทอดมาจาก HomePage ผ่าน ItemListSection
+class ItemListSection extends StatelessWidget {
+  final List<Item> catalog;
+  final List<Item> savedItems; // รับมาจาก HomePage แล้วต้อง "ส่งทอด" ต่อให้ ItemCard ทุกใบ
+  final void Function(Item item) onSave; // ฟังก์ชันเดียวกันที่ต้องส่งทอดต่อเช่นกัน
 
-  const ItemCard({
+  const ItemListSection({
     super.key,
-    required this.item,
+    required this.catalog,
     required this.savedItems,
     required this.onSave,
   });
 
   @override
   Widget build(BuildContext context) {
-    // เช็คว่าไอเทมนี้ถูกบันทึกไปแล้วหรือยัง โดยเทียบ id กับรายการที่ส่งเข้ามา
-    final alreadySaved = savedItems.any((i) => i.id == item.id);
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: ListTile(
-        title: Text(item.title),
-        subtitle: Text('฿${item.price.toStringAsFixed(0)}'),
-        trailing: ElevatedButton(
-          // ปิดปุ่ม (onPressed: null) ถ้าบันทึกไปแล้ว ป้องกันการกดซ้ำสร้างรายการซ้ำ
-          onPressed: alreadySaved ? null : () => onSave(item),
-          child: Text(alreadySaved ? '❤️ บันทึกแล้ว' : '🤍 บันทึกเป็นรายการโปรด'),
-        ),
-      ),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: catalog.length,
+      itemBuilder: (context, index) {
+        final item = catalog[index];
+        // ตัวมันเองไม่แตะ savedItems/onSave เลย แค่ "ส่งผ่าน" ไปให้ ItemCard เท่านั้น
+        return ItemCard(item: item, savedItems: savedItems, onSave: onSave);
+      },
     );
   }
 }
