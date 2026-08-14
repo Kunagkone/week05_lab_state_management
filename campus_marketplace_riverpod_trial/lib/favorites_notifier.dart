@@ -2,18 +2,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'item.dart';
 
 class FavoritesNotifier extends StateNotifier<List<Item>> {
-  FavoritesNotifier() : super([]); // ค่าเริ่มต้นคือลิสต์ว่าง เทียบเท่า _items = [] ใน ChangeNotifier
+  FavoritesNotifier() : super([]); // ค่าเริ่มต้นคือลิสต์ว่าง
 
-  // ใช้ spread operator [...state, item] สร้างลิสต์ใหม่ทั้งก้อน แทนการ mutate ลิสต์เดิม
+  // (ส่วนที่ 4) เพิ่มสินค้า
   void add(Item item) => state = [...state, item];
 
-  // เช่นเดียวกัน ใช้ .where() สร้างลิสต์ใหม่ที่ไม่มีไอเทมนี้อยู่ แทนการ remove ตรง ๆ
+  // (ส่วนที่ 4) ลบสินค้า
   void remove(Item item) => state = state.where((i) => i.id != item.id).toList();
 
+  // (ส่วนที่ 5) ล้างรายการโปรดทั้งหมด
+  void clear() => state = [];
+
+  // (ส่วนที่ 4) คำนวณราคารวม
   double get totalValue => state.fold(0, (sum, i) => sum + i.price);
 }
 
-// ประกาศ Provider เป็นตัวแปร global เทียบเท่ากับการลงทะเบียน ChangeNotifierProvider ใน main.dart
+// (ส่วนที่ 4) ประกาศ Provider เป็นตัวแปร Global
 final favoritesProvider = StateNotifierProvider<FavoritesNotifier, List<Item>>(
   (ref) => FavoritesNotifier(),
 );
